@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-export APP=taxon
-
 apt-get update
 apt-get upgrade -y
 apt-get autoremove -y
@@ -27,6 +25,10 @@ if [[ ! -e ~/.apache_done ]]; then
     # restart
     service apache2 start
     touch ~/.apache_done
+fi
+
+if [[ ! -e /vagrant/data ]]; then
+    su vagrant -lc 'cd /vagrant && php dwca2sql.php';
 fi
 
 # done

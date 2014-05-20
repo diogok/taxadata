@@ -58,15 +58,15 @@
                     for(var i=0;i<data.result.length;i++) {
                         html += "<li>";
                         html += "<i>"+data.result[i].scientificNameWithoutAuthorship+"</i> "+data.result[i].scientificNameAuthorship;
-                        html += "&nbsp; <a href='"+data.result[i].links.flora+"' target='_blank'><span class='glyphicon glyphicon-leaf'></span></a>";
-                        html += "&nbsp; <a href='"+data.result[i].links.occurrences+"' target='_blank'><span class='glyphicon glyphicon-globe'></span></a>";
+                        html += "&nbsp; <a href='"+data.result[i].links.flora+"' title='view flora' target='_blank'><span class='glyphicon glyphicon-leaf'></span></a>";
+                        html += "&nbsp; <a href='"+data.result[i].links.occurrences+"' title='view occurrences' target='_blank'><span class='glyphicon glyphicon-globe'></span></a>";
                         html += "<ul>";
                         for(var ii=0;ii<data.result[i].synonyms.length;ii++) {
                             html += "<li>";
                             html += "<i>"+data.result[i].synonyms[ii].scientificNameWithoutAuthorship+"</i> ";
                             html += data.result[i].synonyms[ii].scientificNameAuthorship;
-                            html += "&nbsp; <a href='"+data.result[i].synonyms[ii].links.flora+"' target='_blank'><span class='glyphicon glyphicon-leaf'></span></a>";
-                            html += "&nbsp; <a href='"+data.result[i].synonyms[ii].links.occurrences+"' target='_blank'><span class='glyphicon glyphicon-globe'></span></a>";
+                            html += "&nbsp; <a href='"+data.result[i].synonyms[ii].links.flora+"' title='view flora' target='_blank'><span class='glyphicon glyphicon-leaf'></span></a>";
+                            html += "&nbsp; <a href='"+data.result[i].synonyms[ii].links.occurrences+"' title='view occurrences' target='_blank'><span class='glyphicon glyphicon-globe'></span></a>";
                             html += "</li>";
                         }
                         html += "</ul>";

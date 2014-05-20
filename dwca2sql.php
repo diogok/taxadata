@@ -19,7 +19,10 @@ if($create) {
 }
 
 download(DWCA,"data/dwca.zip");
+
+echo "Unzipping...\n";
 unzip("data/dwca.zip","data/dwca");
+echo "Unzipepd.\n";
 
 $f=fopen("data/dwca/taxon.txt",'r');
 
@@ -32,6 +35,8 @@ for($i=0;$i<count($headersRow);$i++){
 
 $insert = $db->prepare("INSERT INTO taxons (taxonID,family,scientificName,scientificNameWithoutAuthorship,scientificNameAuthorship,taxonomicStatus,acceptedNameUsage,higherClassification) VALUES (?,?,?,?,?,?,?,?) ;");
 
+$i=0;
+echo "Inserting...\n";
 while($row = fgetcsv($f,0,"\t")) {
     # translate taxonomicStatus
     $row[$headers['taxonomicStatus']] = $strings[$row[$headers['taxonomicStatus']]] ;
@@ -65,7 +70,19 @@ while($row = fgetcsv($f,0,"\t")) {
         $row[ $headers['higherClassification'] ]
     );
     $insert->execute($taxon);
+    echo "Inserted $i = {$taxon[0]}.\n";
+    $i++;
+
+}
+
+if(defined(COUCHDB)) {
+    $q = $pdo->select("select * from taxons;");
+    $docs = array("docs"=>array());
+    while($doc = $q->fetchObject()) $docs["docs"][] = $doc;
+    http_post(COUCHDB."/_bulk_docs",$docs);
 }
 
 fclose($f);
+
+echo "Done.\n";
 
