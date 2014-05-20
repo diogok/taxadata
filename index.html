@@ -1,0 +1,82 @@
+<?php require 'utils.php' ?><!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flora Data Integration</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+    <style type="text/css">
+        #families ul {
+            display: block;
+            width: 100%;
+            height: 500px;
+            overflow-x: hidden;
+        }
+        i {
+            color: #20AE54;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="col-md-12">
+            <h1>Flora Data Integration</h1>
+        </header>
+        <div class="col-md-4" id='families'>
+            <h3>Families</h3>
+            <ul>
+                <li>Loading...</li>
+            </ul>
+        </div>
+        <div class="col-md-8" id='species'>
+            <h3>Species</h3>
+            <ul>
+                <li>Select a family.</li>
+            </ul>
+        </div>
+    </div>
+    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        $.getJSON("api/v1/families",function(data) {
+            data.result.sort();
+            var html = "";
+            for(var i=0;i<data.result.length;i++) {
+                html += "<li><a href='#"+data.result[i]+"'>"+data.result[i]+"</a></li>";
+            }
+            $("#families ul").html(html);
+        });
+
+        var lastHash = "";
+        setInterval(function(){
+            if(location.hash != lastHash) {
+                $("#species h3").html("Species for "+location.hash.substring(1));
+                $("#species ul").html("<li>Loading...</li>");
+                $.getJSON("api/v1/species?family="+location.hash.substring(1),function(data) {
+                    data.result.sort();
+                    var html = "";
+                    for(var i=0;i<data.result.length;i++) {
+                        html += "<li>";
+                        html += "<i>"+data.result[i].scientificNameWithoutAuthorship+"</i> "+data.result[i].scientificNameAuthorship;
+                        html += "&nbsp; <a href='"+data.result[i].links.flora+"' target='_blank'><span class='glyphicon glyphicon-leaf'></span></a>";
+                        html += "&nbsp; <a href='"+data.result[i].links.occurrences+"' target='_blank'><span class='glyphicon glyphicon-globe'></span></a>";
+                        html += "<ul>";
+                        for(var ii=0;ii<data.result[i].synonyms.length;ii++) {
+                            html += "<li>";
+                            html += "<i>"+data.result[i].synonyms[ii].scientificNameWithoutAuthorship+"</i> ";
+                            html += data.result[i].synonyms[ii].scientificNameAuthorship;
+                            html += "&nbsp; <a href='"+data.result[i].synonyms[ii].links.flora+"' target='_blank'><span class='glyphicon glyphicon-leaf'></span></a>";
+                            html += "&nbsp; <a href='"+data.result[i].synonyms[ii].links.occurrences+"' target='_blank'><span class='glyphicon glyphicon-globe'></span></a>";
+                            html += "</li>";
+                        }
+                        html += "</ul>";
+                        html += "</li>";
+                    }
+                    $("#species ul").html(html);
+                });
+            }
+            lastHash = location.hash;
+        },500);
+    </script>
+</body>
+</html>
