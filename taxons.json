@@ -1,0 +1,59 @@
+{
+    "apiVersion":"v1",
+    "swaggerVersion":"1.2",
+    "resourcePath":"search",
+    "produces":["application/json"],
+    "models":{},
+    "apis": [
+        {
+            "path":"/v1/families",
+            "operations":[
+                {
+                    "method":"GET",
+                    "summary":"List all families.",
+                    "nickname":"families",
+                    "parameters":[ ]
+                }
+            ]
+        },
+        {
+            "path":"/v1/species",
+            "operations":[
+                {
+                    "method":"GET",
+                    "summary":"Get species for family, with synonyms",
+                    "nickname":"search",
+                    "parameters":[
+                        {
+                            "name":"family",
+                            "description":"Name of family",
+                            "required":true,
+                            "type":"string",
+                            "paramType":"query"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path":"/v1/occs",
+            "operations":[
+                {
+                    "method":"GET",
+                    "summary":"Get occurrences for a name(specie).",
+                    "nickname":"occurrences",
+                    "parameters":[
+                        {
+                            "name":"scientificName",
+                            "description":"Name of specie, like: Aphelandra longiflora",
+                            "required":true,
+                            "type":"string",
+                            "paramType":"query"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
+
