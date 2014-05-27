@@ -1,6 +1,21 @@
 <?php
 
-require 'utils.php';
+$ini = parse_ini_file(__DIR__."/../config.ini");
+foreach($ini as $k=>$v) {
+    if(!defined($k)) {
+        define($k,$v);
+    }
+}
+
+function http_get($url) {
+    return json_decode(file_get_contents($url));
+}
+
+function http_post($url,$data) {
+    $opts = ['http'=>['method'=>'POST','content'=>json_encode($data),'header'=>'Content-type: application/json']];
+    $r = file_get_contents($url, NULL, stream_context_create($opts));
+    return json_decode($r);
+}
 
 if(isset($_SERVER['HTTP_ORIGIN'])) {
     header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
@@ -26,7 +41,7 @@ if(isset($_GET['callback'])) {
     echo $_GET['callback'].'(';
 }
 
-$db = new PDO('sqlite:data/taxons.db');
+$db = new PDO('sqlite:../data/taxons.db');
 
 $r = new StdClass;
 $r->success=true;

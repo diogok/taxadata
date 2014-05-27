@@ -1,7 +1,45 @@
 <?php
 
-require 'utils.php';
-require 'strings.php';
+$strings = array(
+    null=>'',
+    ''=>'',
+    ' '=>' ',
+    'NOME_ACEITO'=>'accepted',
+    'SINONIMO'=>"synonym",
+    'CLASSE'=>"class",
+    'DIVISAO'=>"division",
+    'ESPECIE'=>"species",
+    'FAMILIA'=>"family",
+    'FORMA'=>"form",
+    'GENERO'=>"genus",
+    'ORDEM'=>"order",
+    'SUB_ESPECIE'=>"subspecies",
+    'SUB_FAMILIA'=>"subfamily",
+    'TRIBO'=>"tribe",
+    'VARIEDADE'=>"variety"
+);
+
+$ini = parse_ini_file(__DIR__."/config.ini");
+foreach($ini as $k=>$v) {
+    if(!defined($k)) {
+        define($k,$v);
+    }
+}
+
+function download($url,$output) {
+    if(file_Exists($output)) unlink($output);
+    system("wget '".$url."' -O '".$output."'");
+}
+
+function unzip($file,$dst){
+    if(!file_exists($dst)) mkdir($dst);
+    $zip = new ZipArchive;
+    if ($zip->open($file) === TRUE) {
+        $zip->extractTo($dst);
+        $zip->close();
+    }
+}
+
 
 # create data dir if not exists
 if(!file_exists("data")) mkdir("data");

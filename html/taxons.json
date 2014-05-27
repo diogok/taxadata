@@ -1,7 +1,7 @@
 {
     "apiVersion":"v1",
     "swaggerVersion":"1.2",
-    "resourcePath":"search",
+    "resourcePath":"/v1",
     "produces":["application/json"],
     "models":{},
     "apis": [

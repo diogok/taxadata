@@ -7,6 +7,6 @@
 Options -Indexes
 
 RewriteEngine On
-RewriteBase /
-RewriteRule ^api/v1/(.*)$ api.php?q=/$1 [QSA]
+#RewriteBase /
+RewriteRule ^api/v1/(.*)$ api.php?q=/$1 [L,QSA]
 
