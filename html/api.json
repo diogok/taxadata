@@ -8,7 +8,7 @@
     },
     "apis":[
         {
-            "path":"/../taxons.json",
+            "path":"/../v1.json",
             "description":"Services"
         }
     ]

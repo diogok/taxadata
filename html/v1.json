@@ -36,7 +36,7 @@
             ]
         },
         {
-            "path":"/v1/occs",
+            "path":"/v1/occurrences",
             "operations":[
                 {
                     "method":"GET",

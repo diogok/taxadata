@@ -80,7 +80,7 @@ if($q=='/families') {
             }
         }
         $row->links->occurrences = $url;
-        $dwc_url = "http://".$_SERVER["HTTP_HOST"]."/api/v1/occs?scientificName=".urlencode($row->scientificName);
+        $dwc_url = "http://".$_SERVER["HTTP_HOST"]."/api/v1/occurrences?scientificName=".urlencode($row->scientificName);
         $row->links->occurrences = str_replace("{url}",urlencode( $dwc_url ),$url);
 
         if($row->taxonomicStatus == 'accepted') {
@@ -98,14 +98,14 @@ if($q=='/families') {
             }
         }
     }
-} else if($q=='/occs') {
+} else if($q=='/occurrences') {
     $json = http_get(DWC_SERVICES."/search/tapir?url=".urlencode(TAPIR)."&field=scientificName&value=".urlencode($_GET["scientificName"])."");
     foreach($json->records as $r) {
         if(isset($r->decimalLatitude)) $r->decimalLatitude = (float) $r->decimalLatitude;
         if(isset($r->decimalLongitude)) $r->decimalLongitude = (float) $r->decimalLongitude;
     }
     $r = $json->records;
-} else if($q=='/geo') {
+} else if($q=='/geojson') {
     $json = http_get(DWC_SERVICES."/search/tapir?url=".urlencode(TAPIR)."&field=scientificName&value=".urlencode($_GET["scientificName"])."");
     $geojson = http_post(DWC_SERVICES."/convert?from=json&to=geojson",$json->records);
     foreach($geojson->features as $i=>$feature) {
