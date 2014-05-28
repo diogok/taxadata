@@ -80,8 +80,8 @@ if($q=='/families') {
             }
         }
         $row->links->occurrences = $url;
-        $dwc_url = "http://".$_SERVER["HTTP_HOST"]."/api/v1/occurrences?scientificName=".urlencode($row->scientificName);
-        $row->links->occurrences = str_replace("{url}",urlencode( $dwc_url ),$url);
+        $dwc_url = "http://".$_SERVER["HTTP_HOST"]."/api/v1/occurrences?scientificName=".urlencode($row->scientificNameWithoutAuthorship);
+        $row->links->occurrences = str_replace("{url}",urlencode($dwc_url),$url);
 
         if($row->taxonomicStatus == 'accepted') {
             $row->synonyms = array();
