@@ -1,5 +1,8 @@
 <?php
 
+$DWCA="http://ipt.jbrj.gov.br/ipt/archive.do?r=lista_especies_flora_brasil";
+#$COUCHDB="";
+
 $strings = array(
     null=>'',
     ''=>'',
@@ -19,13 +22,6 @@ $strings = array(
     'VARIEDADE'=>"variety"
 );
 
-$ini = parse_ini_file(__DIR__."/config.ini");
-foreach($ini as $k=>$v) {
-    if(!defined($k)) {
-        define($k,$v);
-    }
-}
-
 function download($url,$output) {
     if(file_Exists($output)) unlink($output);
     system("wget '".$url."' -O '".$output."'");
@@ -39,7 +35,6 @@ function unzip($file,$dst){
         $zip->close();
     }
 }
-
 
 # create data dir if not exists
 if(!file_exists("data")) mkdir("data");
@@ -56,7 +51,7 @@ if($create) {
     $db->exec("DELETE FROM taxons ;");
 }
 
-download(DWCA,"data/dwca.zip");
+download($DWCA,"data/dwca.zip");
 
 echo "Unzipping...\n";
 unzip("data/dwca.zip","data/dwca");
@@ -71,7 +66,7 @@ for($i=0;$i<count($headersRow);$i++){
     $headers[$headersRow[$i]] = $i;
 }
 
-$insert = $db->prepare("INSERT INTO taxons (taxonID,family,scientificName,scientificNameWithoutAuthorship,scientificNameAuthorship,taxonomicStatus,acceptedNameUsage,higherClassification) VALUES (?,?,?,?,?,?,?,?) ;");
+$insert = $db->prepare("INSERT INTO taxons (taxonID,family,genus,scientificName,scientificNameWithoutAuthorship,scientificNameAuthorship,taxonomicStatus,acceptedNameUsage,higherClassification) VALUES (?,?,?,?,?,?,?,?,?) ;");
 
 $i=0;
 echo "Inserting...\n";
@@ -100,6 +95,7 @@ while($row = fgetcsv($f,0,"\t")) {
     $taxon = array(
         $row[ $headers['taxonID'] ],
         $row[ $headers['family'] ],
+        $row[ $headers['genus'] ],
         $row[ $headers['scientificName'] ],
         $nameWithoutAuthor,
         $row[ $headers['scientificNameAuthorship'] ],
@@ -113,11 +109,17 @@ while($row = fgetcsv($f,0,"\t")) {
 
 }
 
-if(defined(COUCHDB)) {
+function http_post($url,$data) {
+    $opts = ['http'=>['method'=>'POST','content'=>json_encode($data),'header'=>'Content-type: application/json']];
+    $r = file_get_contents($url, NULL, stream_context_create($opts));
+    return json_decode($r);
+}
+
+if(isset($COUCHDB)) {
     $q = $pdo->select("select * from taxons;");
     $docs = array("docs"=>array());
     while($doc = $q->fetchObject()) $docs["docs"][] = $doc;
-    http_post(COUCHDB."/_bulk_docs",$docs);
+    http_post($COUCHDB."/_bulk_docs",$docs);
 }
 
 fclose($f);

@@ -1,10 +1,19 @@
 <?php
 
-$ini = parse_ini_file(__DIR__."/../config.ini");
-foreach($ini as $k=>$v) {
-    if(!defined($k)) {
-        define($k,$v);
-    }
+require 'config.php';
+
+$time=time();
+$ltime=$time;
+function loge($str) {
+    global $time;
+    global $ltime;
+    $mytime = time();
+    echo "-".$str.":".($mytime-$ltime)."\n";
+    #echo "-".$str."\n";
+    #echo "--from last:".($mytime-$ltime)."\n";
+    #echo "--from start:".($mytime-$time)."\n";
+    $ltime=time();
+    flush();
 }
 
 function http_get($url) {
@@ -65,7 +74,7 @@ if($q=='/families') {
     while($row = $query->fetchObject()) {
         $row->links = new StdClass;
 
-        $url = FLORA_LINK;
+        $url = $FLORA_LINK;
         foreach($row as $k=>$v) {
             if(is_string($v)) {
                 $url = str_replace('{'.$k.'}',$v,$url);
@@ -73,7 +82,7 @@ if($q=='/families') {
         }
         $row->links->flora = $url;
 
-        $url = OCCS_LINK;
+        $url = $OCCS_LINK;
         foreach($row as $k=>$v) {
             if(is_string($v)) {
                 $url = str_replace('{'.$k.'}',$v,$url);
@@ -99,20 +108,71 @@ if($q=='/families') {
         }
     }
 } else if($q=='/occurrences') {
-    $json = http_get(DWC_SERVICES."/search/tapir?url=".urlencode(TAPIR)."&field=scientificName&value=".urlencode($_GET["scientificName"])."");
-    foreach($json->records as $r) {
-        if(isset($r->decimalLatitude)) $r->decimalLatitude = (float) $r->decimalLatitude;
-        if(isset($r->decimalLongitude)) $r->decimalLongitude = (float) $r->decimalLongitude;
+    $records = array();
+    $got=array();
+
+    $q=$db->prepare("select * from taxons where scientificName=? OR scientificNameWithoutAuthorship=?");
+    $q->execute(array($_GET["scientificName"],$_GET["scientificName"]));
+    $taxon = $q->fetchObject();
+
+    $file = "../data/cache/".$taxon->family."/".$taxon->scientificNameWithoutAuthorship.".json";
+    if(!file_exists("../data/cache")) {
+        mkdir("../data/cache");
     }
-    $r = $json->records;
-} else if($q=='/geojson') {
-    $json = http_get(DWC_SERVICES."/search/tapir?url=".urlencode(TAPIR)."&field=scientificName&value=".urlencode($_GET["scientificName"])."");
-    $geojson = http_post(DWC_SERVICES."/convert?from=json&to=geojson",$json->records);
-    foreach($geojson->features as $i=>$feature) {
-        $feature->geometry->coordinates[0] = (float) $feature->geometry->coordinates[0];
-        $feature->geometry->coordinates[1] = (float) $feature->geometry->coordinates[1];
+    if(!file_exists("../data/cache/".$taxon->family)) {
+        mkdir("../data/cache/".$taxon->family);
     }
-    $r = $geojson;
+    if(file_exists($file)) {
+        $r = json_decode(file_get_contents($file));
+    } else {
+        $q=$db->prepare("select * from taxons where acceptedNameUsage=?");
+        $q->execute(array($taxon->scientificName));
+        $taxons=array();
+        while($t=$q->fetchObject()) $taxons[]=$t;
+
+        foreach($taxons as $taxon) {
+            foreach($TAPIR as $tapir) {
+                $parts=explode("|",$tapir);
+                $url  = $parts[0];
+                $field1 = $parts[1];
+                $field2 = $parts[2];
+                $value  = $taxon->$field2;
+
+                $json = http_get($DWC_SERVICES."/search/tapir?url=".urlencode($url)
+                                              ."&field=".$field1."&value=".urlencode($value));
+                $fixed = http_post($DWC_SERVICES."/fix",$json->records);
+                foreach($fixed as $r) {
+                    $_s0 = trim( $taxon->scientificNameWithoutAuthorship );
+                    $_c  = strlen($_s0);
+                    $_s1 = trim( substr($r->scientificName,0,$_c) );
+                    if($_s0 == $_s1) {
+                        if(!isset($got[$r->occurrenceID])) {
+                            foreach($taxon as $k=>$v) {
+                                $r->$k=$v;
+                            }
+                            $records[] = $r;
+                            $got[$r->occurrenceID] = true;
+                        }
+                    }
+                }
+            }
+            $json = http_get($DWC_SERVICES."/search/gbif?field=scientificName&value=".urlencode($taxon->scientificNameWithoutAuthorship));
+            $fixed = http_post($DWC_SERVICES."/fix",$json->results);
+            foreach($fixed as $r) {
+                foreach($taxon as $k=>$v) $r->$k=$v;
+                if(!isset($got[$r->occurrenceID])) {
+                    $records[] = $r;
+                    $got[$r->occurrenceID] = true;
+                }
+            }
+        }
+
+        $r = $records;
+
+        if(!file_exists($file)) {
+            file_put_contents($file,json_encode($r));
+        }
+    }
 }
 
 echo json_encode($r);
