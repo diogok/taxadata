@@ -3,7 +3,7 @@
     "swaggerVersion":"1.2",
     "info":{
         "title":"Taxonomy, flora and occurrences.",
-        "description":"Taxonomy listing and flora integration.<br />Names from flora do brasil, occurrences from species link.",
+        "description":"Taxonomy listing and flora integration.<br />Names from flora do brasil, occurrences from species link, jabot(jbrj) and gbif.",
         "contact":"diogo@diogok.net"
     },
     "apis":[
