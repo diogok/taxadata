@@ -122,6 +122,12 @@ if($q=='/families') {
     if(!file_exists("../data/cache/".$taxon->family)) {
         mkdir("../data/cache/".$taxon->family);
     }
+    $mtime = filemtime($file);
+    if(file_exists($file)) {
+        if($mtime < (time() - (7*24*60*60))) {
+            unlink($file);
+        }
+    }
     if(file_exists($file)) {
         $r = json_decode(file_get_contents($file));
     } else {
