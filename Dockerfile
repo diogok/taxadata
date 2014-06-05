@@ -12,6 +12,8 @@ RUN sed -i -e 's/memory_limit.*/memory_limit=512M/g' /etc/php5/apache2/php.ini &
 ADD . /var/www
 ADD default.conf /etc/apache2/sites-available/000-default.conf
 
+RUN chown www-data.www-data /var/www -Rf
+
 ENV APACHE_RUN_USER www-data
 ENV APACHE_RUN_GROUP www-data
 ENV APACHE_LOG_DIR /var/log/apache2
