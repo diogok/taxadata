@@ -78,10 +78,16 @@
                     data.result.sort();
                     var html = "";
                     for(var i=0;i<data.result.length;i++) {
+                        var lflora="http://floradobrasil.jbrj.gov.br/jabot/listaBrasil/FichaPublicaTaxonUC/FichaPublicaTaxonUC.do?id=FB"
+                                    +data.result[i].taxonID;
+                        var ldwc = location.origin+location.pathname.replace("index.html","")+"api/v1/occurrences?scientificName="
+                                   +encodeURIComponent(data.result[i].scientificNameWithoutAuthorship);
+                        var loccs="http://cncflora.jbrj.gov.br/recline/index.html?from="+encodeURIComponent(ldwc);
+
                         html += "<li>";
                         html += "<i>"+data.result[i].scientificNameWithoutAuthorship+"</i> "+data.result[i].scientificNameAuthorship;
-                        html += "&nbsp; <a href='"+data.result[i].links.flora+"' title='view flora' target='_blank'><span class='glyphicon glyphicon-leaf'></span></a>";
-                        html += "&nbsp; <a href='"+data.result[i].links.occurrences+"' title='view occurrences' target='_blank'><span class='glyphicon glyphicon-globe'></span></a>";
+                        html += "&nbsp; <a href='"+lflora+"' title='view flora' target='_blank'><span class='glyphicon glyphicon-leaf'></span></a>";
+                        html += "&nbsp; <a href='"+loccs+"' title='view occurrences' target='_blank'><span class='glyphicon glyphicon-globe'></span></a>";
                         html += "<ul>";
                         for(var ii=0;ii<data.result[i].synonyms.length;ii++) {
                             html += "<li>";

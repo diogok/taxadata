@@ -20,13 +20,32 @@
             "path":"/v1/species",
             "operations":[
                 {
-                    "method":"GET",
-                    "summary":"Get species for family, with synonyms",
+                    "method":"get",
+                    "summary":"get species for family, with synonyms",
                     "nickname":"search",
                     "parameters":[
                         {
                             "name":"family",
-                            "description":"Name of family",
+                            "description":"name of family",
+                            "required":true,
+                            "type":"string",
+                            "paramType":"query"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path":"/v1/search/species",
+            "operations":[
+                {
+                    "method":"get",
+                    "summary":"Search a specie",
+                    "nickname":"search",
+                    "parameters":[
+                        {
+                            "name":"query",
+                            "description":"part of name of specie",
                             "required":true,
                             "type":"string",
                             "paramType":"query"
