@@ -22,11 +22,30 @@
                 {
                     "method":"get",
                     "summary":"get species for family, with synonyms",
-                    "nickname":"search",
+                    "nickname":"species",
                     "parameters":[
                         {
                             "name":"family",
                             "description":"name of family",
+                            "required":true,
+                            "type":"string",
+                            "paramType":"query"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path":"/v1/specie",
+            "operations":[
+                {
+                    "method":"get",
+                    "summary":"get species a specie data, with synonyms",
+                    "nickname":"specie",
+                    "parameters":[
+                        {
+                            "name":"scientificName",
+                            "description":"name of specie",
                             "required":true,
                             "type":"string",
                             "paramType":"query"

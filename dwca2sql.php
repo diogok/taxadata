@@ -66,7 +66,7 @@ for($i=0;$i<count($headersRow);$i++){
     $headers[$headersRow[$i]] = $i;
 }
 
-$insert = $db->prepare("INSERT INTO taxons (taxonID,family,genus,scientificName,scientificNameWithoutAuthorship,scientificNameAuthorship,taxonomicStatus,acceptedNameUsage,higherClassification) VALUES (?,?,?,?,?,?,?,?,?) ;");
+$insert = $db->prepare("INSERT INTO taxons (taxonID,family,genus,scientificName,scientificNameWithoutAuthorship,scientificNameAuthorship,taxonomicStatus,acceptedNameUsage,taxonRank,higherClassification) VALUES (?,?,?,?,?,?,?,?,?,?) ;");
 
 $i=0;
 echo "Inserting...\n";
@@ -101,6 +101,7 @@ while($row = fgetcsv($f,0,"\t")) {
         $row[ $headers['scientificNameAuthorship'] ],
         $row[ $headers['taxonomicStatus'] ],
         $row[ $headers['acceptedNameUsage'] ],
+        $row[ $headers['taxonRank'] ],
         $row[ $headers['higherClassification'] ]
     );
     $insert->execute($taxon);
@@ -109,17 +110,12 @@ while($row = fgetcsv($f,0,"\t")) {
 
 }
 
-function http_post($url,$data) {
-    $opts = ['http'=>['method'=>'POST','content'=>json_encode($data),'header'=>'Content-type: application/json']];
-    $r = file_get_contents($url, NULL, stream_context_create($opts));
-    return json_decode($r);
-}
-
 if(isset($COUCHDB)) {
     $q = $pdo->select("select * from taxons;");
     $docs = array("docs"=>array());
     while($doc = $q->fetchObject()) $docs["docs"][] = $doc;
-    http_post($COUCHDB."/_bulk_docs",$docs);
+    $opts = ['http'=>['method'=>'POST','content'=>json_encode($docs),'header'=>'Content-type: application/json']];
+    file_get_contents($COUCHDB."/_bulk_docs", NULL, stream_context_create($opts));
 }
 
 fclose($f);

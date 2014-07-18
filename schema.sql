@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS taxons (
     `scientificNameWithoutAuthorship` VARCHAR(250),
     `taxonomicStatus` VARCHAR(250),
     `acceptedNameUsage` VARCHAR(250),
+    `taxonRank`VARCHAR(250),
     `higherClassification` VARCHAR(250),
     PRIMARY KEY ( scientificName )
 );

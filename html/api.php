@@ -94,6 +94,35 @@ if($q=='/search/species') {
             }
         }
     }
+} else if($q=='/specie') {
+    $q = $db->prepare("select * from taxons where scientificName = ? or acceptedNameUsage like ? or scientificNameWithoutAuthorship = ?");
+    $q->execute(array($_GET["scientificName"],"%".$_GET["scientificName"]."%",$_GET["scientificName"]));
+
+    $r->result=null;
+    $miss=[];
+
+    while($row = $q->fetchObject()) {
+        if($row->taxonomicStatus == 'accepted') {
+            $r->result = $row;
+            $r->result->synonyms=[];
+        } else {
+            $miss[] = $row;
+        }
+    }
+
+    if($r->result == null) {
+        $r->result = $db->query("select * from taxons where scientificName = '".$miss[0]->acceptedNameUsage."';")->fetchObject();
+    }
+
+    if($r->result != null) {
+        foreach($miss as $syn) {
+            if($syn->acceptedNameUsage == $r->result->scientificName) {
+                $r->result->synonyms[] = $syn;
+            }
+        }
+    } else if(count($miss) >= 1) {
+        $r->result = $miss[0];
+    } 
 } else if($q=='/occurrences') {
     $records = array();
     $got=array();
