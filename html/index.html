@@ -82,7 +82,7 @@
                                     +data.result[i].taxonID;
                         var ldwc = location.origin+location.pathname.replace("index.html","")+"api/v1/occurrences?scientificName="
                                    +encodeURIComponent(data.result[i].scientificNameWithoutAuthorship);
-                        var loccs="http://cncflora.jbrj.gov.br/recline/index.html?from="+encodeURIComponent(ldwc);
+                        var loccs="recline/index.html?from="+encodeURIComponent(ldwc);
 
                         html += "<li>";
                         html += "<i>"+data.result[i].scientificNameWithoutAuthorship+"</i> "+data.result[i].scientificNameAuthorship;
