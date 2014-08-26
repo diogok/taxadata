@@ -102,7 +102,9 @@ if($q=='/search/species') {
     $miss=[];
 
     while($row = $q->fetchObject()) {
-        if($row->taxonomicStatus == 'accepted') {
+        if($row->taxonomicStatus == 'accepted' &&
+            ($row->scientificName == $_GET["scientificName"] || $row->scientificNameWithoutAuthorship == $_GET["scientificName"] )
+        ) {
             $r->result = $row;
             $r->result->synonyms=[];
         } else {
@@ -110,7 +112,7 @@ if($q=='/search/species') {
         }
     }
 
-    if($r->result == null) {
+    if($r->result == null && count( $miss ) >= 1) {
         $r->result = $db->query("select * from taxons where scientificName = '".$miss[0]->acceptedNameUsage."';")->fetchObject();
     }
 
