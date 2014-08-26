@@ -89,7 +89,7 @@ while($row = fgetcsv($f,0,"\t")) {
     }
 
     #scientificName without author
-    $nameWithoutAuthor = trim(str_replace($row[$headers['scientificNameAuthorship']],'',$row[$headers['scientificName']]));
+    $nameWithoutAuthor = trim(str_replace(" ".$row[$headers['scientificNameAuthorship']],'',$row[$headers['scientificName']]));
 
     # insert
     $taxon = array(
