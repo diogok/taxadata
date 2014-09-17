@@ -1,10 +1,12 @@
 # Taxon Data
 
-Experimental data integration service for the Brasilian Flora.
+Simplifying integration of DwC-A Checklist as a services.
 
-Loads the IPT DwC-A from Flora do Brasil into an SQLite and expose an API on it.
+It loads an DarwinCore-Archive checklist into a database (sqlite, mysql or postgresql) and expose it's data as a restful webservice.
 
-Test on [CNCFlora.jbrj](http://cncflora.jbrj.gov.br/flora), and view the Developer API there.
+It is also capable of searching for occurrences for the loaded taxons from other sources.
+
+Test on [CNCFlora.jbrj.gov.br](http://cncflora.jbrj.gov.br/floradata), and view the Developer API there.
 
 ## License
 

@@ -1,8 +1,8 @@
 <?php
 
-$DWCA="http://ipt.jbrj.gov.br/ipt/archive.do?r=lista_especies_flora_brasil";
-#$COUCHDB="";
+include 'config.php';
 
+// translation strings
 $strings = array(
     null=>'',
     ''=>'',
@@ -22,20 +22,6 @@ $strings = array(
     'VARIEDADE'=>"variety"
 );
 
-function download($url,$output) {
-    if(file_Exists($output)) unlink($output);
-    system("wget '".$url."' -O '".$output."'");
-}
-
-function unzip($file,$dst){
-    if(!file_exists($dst)) mkdir($dst);
-    $zip = new ZipArchive;
-    if ($zip->open($file) === TRUE) {
-        $zip->extractTo($dst);
-        $zip->close();
-    }
-}
-
 # create data dir if not exists
 if(!file_exists("data")) mkdir("data");
 
@@ -43,25 +29,36 @@ if(!file_exists("data")) mkdir("data");
 if(!file_exists("data/taxons.db")) $create=true;
 else $create=false;
 
-$db = new PDO('sqlite:data/taxons.db');
+// comes from config
+#$db = new PDO('sqlite:data/taxons.db');
 
-if($create) {
-    $db->exec(file_get_contents("schema.sql"));
-} else {
-    $db->exec("DELETE FROM taxons ;");
-}
+// create table if not exists
+$db->exec(file_get_contents("schema.sql"));
+// clean table
+$db->exec("DELETE FROM taxons ;");
 
-download($DWCA,"data/dwca.zip");
+// download
+echo "Downloading...\n";
+if(file_Exists('data/dwca.zip')) unlink('data/dwca.zip');
+system("wget '".$DWCA."' -O 'data/dwca.zip'");
+echo "Downlaoded.\n";
 
+// Unzing
 echo "Unzipping...\n";
-unzip("data/dwca.zip","data/dwca");
+if(!file_exists($dst)) mkdir($dst);
+$zip = new ZipArchive;
+if ($zip->open($file) === TRUE) {
+    $zip->extractTo($dst);
+    $zip->close();
+}
 echo "Unzipepd.\n";
 
+// start reading the taxons
 $f=fopen("data/dwca/taxon.txt",'r');
 
+// read the headers for easier handling
 $headersRow = fgetcsv($f,0,"\t");
 $headers=array();
-# read the headers for easier handling
 for($i=0;$i<count($headersRow);$i++){
     $headers[$headersRow[$i]] = $i;
 }
@@ -110,12 +107,26 @@ while($row = fgetcsv($f,0,"\t")) {
 
 }
 
+# experimental output to couchdb
 if(isset($COUCHDB)) {
     $q = $pdo->select("select * from taxons;");
     $docs = array("docs"=>array());
-    while($doc = $q->fetchObject()) $docs["docs"][] = $doc;
+    while($doc = $q->fetchObject()) {
+        $doc->metadata = array("type"=>"taxon","created"=>time(),"source"=>$DWCA);
+        $docs["docs"][] = $doc; 
+    }
     $opts = ['http'=>['method'=>'POST','content'=>json_encode($docs),'header'=>'Content-type: application/json']];
     file_get_contents($COUCHDB."/_bulk_docs", NULL, stream_context_create($opts));
+}
+
+# experimental output to elasticsearch
+if(isset($ELASTICSEARCH)) {
+    $q = $pdo->select("select * from taxons;");
+    while($doc = $q->fetchObject()) {
+        $doc->metadata = array("type"=>"taxon","created"=>time(),"source"=>$DWCA);
+        $opts = ['http'=>['method'=>'POST','content'=>json_encode($doc),'header'=>'Content-type: application/json']];
+        file_get_contents($ELASTICSEARCH."/taxon", NULL, stream_context_create($opts));
+    }
 }
 
 fclose($f);

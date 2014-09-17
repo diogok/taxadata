@@ -17,10 +17,10 @@ ENV APACHE_PID_FILE /var/apache2.pid
 
 ADD default.conf /etc/apache2/sites-available/000-default.conf
 
-ADD . /var/www
-RUN chown www-data.www-data /var/www -Rf
-
 EXPOSE 80
 
 CMD ["/usr/sbin/apache2","-D", "FOREGROUND"]
+
+ADD . /var/www
+RUN chown www-data.www-data /var/www -Rf
 
