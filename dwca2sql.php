@@ -41,17 +41,18 @@ $db->exec("DELETE FROM taxons ;");
 echo "Downloading...\n";
 if(file_Exists('data/dwca.zip')) unlink('data/dwca.zip');
 system("wget '".$DWCA."' -O 'data/dwca.zip'");
-echo "Downlaoded.\n";
+echo "Downloaded.\n";
 
 // Unzing
 echo "Unzipping...\n";
+$dst="data/dwca";
 if(!file_exists($dst)) mkdir($dst);
 $zip = new ZipArchive;
-if ($zip->open($file) === TRUE) {
+if ($zip->open("data/dwca.zip") === TRUE) {
     $zip->extractTo($dst);
     $zip->close();
 }
-echo "Unzipepd.\n";
+echo "Unzipped.\n";
 
 // start reading the taxons
 $f=fopen("data/dwca/taxon.txt",'r');
