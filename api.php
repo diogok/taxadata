@@ -39,7 +39,7 @@ if(isset($_GET['callback'])) {
 }
 
 // now comes from config
-#$db = new PDO('sqlite:../data/taxons.db');
+#$db = new PDO('sqlite:data/taxons.db');
 
 // Default response
 $r = new StdClass;
@@ -128,12 +128,12 @@ if($q=='/search/species') { // specie search
     $taxon = $q->fetchObject();
     if($taxon) {
         // cache the search for a week
-        $file = "../data/cache/".$taxon->family."/".$taxon->scientificNameWithoutAuthorship.".json";
-        if(!file_exists("../data/cache")) {
-            mkdir("../data/cache");
+        $file = "data/cache/".$taxon->family."/".$taxon->scientificNameWithoutAuthorship.".json";
+        if(!file_exists("data/cache")) {
+            mkdir("data/cache");
         }
-        if(!file_exists("../data/cache/".$taxon->family)) {
-            mkdir("../data/cache/".$taxon->family);
+        if(!file_exists("data/cache/".$taxon->family)) {
+            mkdir("data/cache/".$taxon->family);
         }
         if(file_exists($file)) {
             $mtime = filemtime($file);
