@@ -10,6 +10,6 @@ CREATE TABLE IF NOT EXISTS taxons (
     `acceptedNameUsage` VARCHAR(250),
     `taxonRank`VARCHAR(250),
     `higherClassification` VARCHAR(250),
-    PRIMARY KEY ( scientificName )
+    PRIMARY KEY ( `taxonID` )
 );
 

@@ -34,9 +34,15 @@ else $create=false;
 
 // create table if not exists
 $db->exec(file_get_contents("schema.sql"));
+$err = $db->errorInfo();
+if($err[0] != "00000") var_dump($db->errorInfo());
+
 // clean table
 $db->exec("DELETE FROM taxons ;");
+$err = $db->errorInfo();
+if($err[0] != "00000") var_dump($db->errorInfo());
 
+/*
 // download
 echo "Downloading...\n";
 if(file_Exists('data/dwca.zip')) unlink('data/dwca.zip');
@@ -53,6 +59,7 @@ if ($zip->open("data/dwca.zip") === TRUE) {
     $zip->close();
 }
 echo "Unzipped.\n";
+*/
 
 // start reading the taxons
 $f=fopen("data/dwca/taxon.txt",'r');
@@ -64,7 +71,9 @@ for($i=0;$i<count($headersRow);$i++){
     $headers[$headersRow[$i]] = $i;
 }
 
-$insert = $db->prepare("INSERT INTO taxons (taxonID,family,genus,scientificName,scientificNameWithoutAuthorship,scientificNameAuthorship,taxonomicStatus,acceptedNameUsage,taxonRank,higherClassification) VALUES (?,?,?,?,?,?,?,?,?,?) ;");
+$insert = $db->prepare("INSERT INTO taxons (`taxonID`,`family`,`genus`,`scientificName`,`scientificNameWithoutAuthorship`,`scientificNameAuthorship`,`taxonomicStatus`,`acceptedNameUsage`,`taxonRank`,`higherClassification`) VALUES (?,?,?,?,?,?,?,?,?,?) ;");
+$err = $db->errorInfo();
+if($err[0] != "00000") var_dump($db->errorInfo());
 
 $i=0;
 echo "Inserting...\n";
@@ -103,10 +112,16 @@ while($row = fgetcsv($f,0,"\t")) {
         $row[ $headers['higherClassification'] ]
     );
     $insert->execute($taxon);
-    echo "Inserted $i = {$taxon[0]}.\n";
+    #echo "Inserted $i = {$taxon[0]}.\n";
+    $err = $insert->errorInfo();
+    if($err[0] != "00000") var_dump($insert->errorInfo());
     $i++;
 
 }
+
+echo "Inserted.\n";
+
+fclose($f);
 
 # experimental output to couchdb
 if(isset($COUCHDB)) {
@@ -130,7 +145,6 @@ if(isset($ELASTICSEARCH)) {
     }
 }
 
-fclose($f);
 
 echo "Done.\n";
 
