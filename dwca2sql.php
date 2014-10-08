@@ -42,7 +42,7 @@ $db->exec("DELETE FROM taxons ;");
 $err = $db->errorInfo();
 if($err[0] != "00000") var_dump($db->errorInfo());
 
-/*
+/* */
 // download
 echo "Downloading...\n";
 if(file_Exists('data/dwca.zip')) unlink('data/dwca.zip');
@@ -59,7 +59,7 @@ if ($zip->open("data/dwca.zip") === TRUE) {
     $zip->close();
 }
 echo "Unzipped.\n";
-*/
+/* */
 
 // start reading the taxons
 $f=fopen("data/dwca/taxon.txt",'r');
@@ -98,6 +98,11 @@ while($row = fgetcsv($f,0,"\t")) {
     #scientificName without author
     $nameWithoutAuthor = trim(str_replace(" ".$row[$headers['scientificNameAuthorship']],'',$row[$headers['scientificName']]));
 
+    $t = [];
+    foreach($headers as $k=>$v) {
+        $t[$k]=$row[$v];
+    }
+
     # insert
     $taxon = array(
         $row[ $headers['taxonID'] ],
@@ -116,7 +121,6 @@ while($row = fgetcsv($f,0,"\t")) {
     $err = $insert->errorInfo();
     if($err[0] != "00000") var_dump($insert->errorInfo());
     $i++;
-
 }
 
 echo "Inserted.\n";
