@@ -72,25 +72,6 @@
                     ]
                 }
             ]
-        },
-        {
-            "path":"/v1/occurrences",
-            "operations":[
-                {
-                    "method":"GET",
-                    "summary":"Get occurrences for a name(specie).",
-                    "nickname":"occurrences",
-                    "parameters":[
-                        {
-                            "name":"scientificName",
-                            "description":"Name of specie, like: Aphelandra longiflora",
-                            "required":true,
-                            "type":"string",
-                            "paramType":"query"
-                        }
-                    ]
-                }
-            ]
         }
     ]
 }

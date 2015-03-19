@@ -36,10 +36,7 @@
     <div class="container">
         <header class="col-md-12">
             <h1>Flora Data.</h1>
-            <h2>Names from <a href="http://floradobrasil.jbrj.gov.br/">Flora do Brasil</a> 
-                and occurrences from <a href='http://splink.cria.org.br/'>Species Link</a>
-                , <a href="http://www.jbrj.gov.br">JBRJ Jabot</a>
-                , <a href="http://www.gbif.org">GBIF.org</a>.</h2>
+            <h2>Names from <a href="http://floradobrasil.jbrj.gov.br/">Flora do Brasil</a>.</h2>
         </header>
         <div class="col-md-4" id='families'>
             <h3>Families</h3>
@@ -54,7 +51,11 @@
             </ul>
         </div>
         <footer class="col-md-12">
-            <p><a href='api.html'>Developer API</a></p>
+            <p>
+              <a href='api.html'>Developer API</a>
+              ,
+              <a href='data/taxons.db'>Download SQLite</a>.
+            </p>
         </footer>
     </div>
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
@@ -87,7 +88,6 @@
                         html += "<li>";
                         html += "<i>"+data.result[i].scientificNameWithoutAuthorship+"</i> "+data.result[i].scientificNameAuthorship;
                         html += "&nbsp; <a href='"+lflora+"' title='view flora' target='_blank'><span class='glyphicon glyphicon-leaf'></span></a>";
-                        html += "&nbsp; <a href='"+loccs+"' title='view occurrences' target='_blank'><span class='glyphicon glyphicon-globe'></span></a>";
                         html += "<ul>";
                         for(var ii=0;ii<data.result[i].synonyms.length;ii++) {
                             html += "<li>";

@@ -19,7 +19,13 @@ $strings = array(
     'SUB_ESPECIE'=>"subspecies",
     'SUB_FAMILIA'=>"subfamily",
     'TRIBO'=>"tribe",
-    'VARIEDADE'=>"variety"
+    'VARIEDADE'=>"variety",
+    'É sinônimo HETEROTIPICO'=>'synonym_of',
+    'É sinônimo HOMOTIPICO'=>'synonym_of',
+    'É sinônimo BASIONIMO'=>'synonym_of',
+    'Tem como sinônimo HETEROTIPICO'=>'has_synonym',
+    'Tem como sinônimo HOMOTIPICO'=>'has_synonym',
+    'Tem como sinônimo BASIONIMO'=>'has_synonym'
 );
 
 # create data dir if not exists
@@ -42,7 +48,6 @@ $db->exec("DELETE FROM taxons ;");
 $err = $db->errorInfo();
 if($err[0] != "00000") var_dump($db->errorInfo());
 
-/* */
 // download
 echo "Downloading...\n";
 if(file_Exists('data/dwca.zip')) unlink('data/dwca.zip');
@@ -59,7 +64,6 @@ if ($zip->open("data/dwca.zip") === TRUE) {
     $zip->close();
 }
 echo "Unzipped.\n";
-/* */
 
 // start reading the taxons
 $f=fopen("data/dwca/taxon.txt",'r');
@@ -122,8 +126,43 @@ while($row = fgetcsv($f,0,"\t")) {
     if($err[0] != "00000") var_dump($insert->errorInfo());
     $i++;
 }
+fclose($f);
 
 echo "Inserted.\n";
+
+// start reading the relations
+$f=fopen("data/dwca/resourcerelationship.txt",'r');
+
+// read the headers for easier handling
+$headersRow = fgetcsv($f,0,"\t");
+$headers=array();
+for($i=0;$i<count($headersRow);$i++){
+    $headers[$headersRow[$i]] = $i;
+}
+
+$update = $db->prepare("UPDATE taxons SET acceptedNameUsage=(SELECT acceptedNameUsage FROM taxons where taxonID=?) where taxonID=?");
+$err = $db->errorInfo();
+if($err[0] != "00000") var_dump($db->errorInfo());
+
+$i=0;
+echo "Updating...\n";
+while($row = fgetcsv($f,0,"\t")) {
+    $relation = ( $strings[$row[$headers['relationshipOfResource']]]);
+
+    $data=false;
+    if($relation == 'synonym_of') {
+      $data = [$row[1],$row[0]];
+    } else if($relation == 'has_synonym') {
+      $data = [$row[0],$row[1]];
+    }
+
+    if($data) {
+      $update->execute($data);
+      $err = $update->errorInfo();
+      if($err[0] != "00000") var_dump($update->errorInfo());
+    }
+    $i++;
+}
 
 fclose($f);
 
