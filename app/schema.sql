@@ -1,5 +1,5 @@
 
-CREATE TABLE IF NOT EXISTS taxons (
+CREATE TABLE IF NOT EXISTS taxa (
     `taxonID` VARCHAR(250),
     `family` VARCHAR(250),
     `genus` VARCHAR(250),
@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS taxons (
     `acceptedNameUsage` VARCHAR(250),
     `taxonRank`VARCHAR(250),
     `higherClassification` VARCHAR(250),
+    `source` VARCHAR(5000),
     PRIMARY KEY ( `taxonID` )
 );
 

@@ -28,15 +28,14 @@ $strings = array(
     'Tem como sinônimo BASIONIMO'=>'has_synonym'
 );
 
+$data = __DIR__.'/../data';
+
 # create data dir if not exists
-if(!file_exists("data")) mkdir("data");
+if(!file_exists($data)) mkdir($data);
 
 # creates db if not exists
-if(!file_exists("data/taxons.db")) $create=true;
+if(!file_exists($data."/taxa.db")) $create=true;
 else $create=false;
-
-// comes from config
-#$db = new PDO('sqlite:data/taxons.db');
 
 // create table if not exists
 $db->exec(file_get_contents("schema.sql"));
@@ -44,29 +43,43 @@ $err = $db->errorInfo();
 if($err[0] != "00000") var_dump($db->errorInfo());
 
 // clean table
-$db->exec("DELETE FROM taxons ;");
+$db->exec("DELETE FROM taxa ;");
 $err = $db->errorInfo();
 if($err[0] != "00000") var_dump($db->errorInfo());
 
 // download
 echo "Downloading...\n";
-if(file_Exists('data/dwca.zip')) unlink('data/dwca.zip');
-system("wget '".$DWCA."' -O 'data/dwca.zip'");
+#if(file_Exists($data.'/dwca.zip')) unlink($data.'/dwca.zip');
+#system("wget '".$DWCA."' -O '".$data."/dwca.zip'");
 echo "Downloaded.\n";
 
 // Unzing
 echo "Unzipping...\n";
-$dst="data/dwca";
+$dst=$data."/dwca";
 if(!file_exists($dst)) mkdir($dst);
 $zip = new ZipArchive;
-if ($zip->open("data/dwca.zip") === TRUE) {
+if ($zip->open($data."/dwca.zip") === TRUE) {
     $zip->extractTo($dst);
     $zip->close();
 }
 echo "Unzipped.\n";
 
-// start reading the taxons
-$f=fopen("data/dwca/taxon.txt",'r');
+$source = "";
+
+// Try to get title and version
+$eml = file_get_contents($dst."/eml.xml");
+preg_match('@<title[^>]*>([^<]+)</title>@',$eml,$reg);
+if(isset($reg[1])) {
+  $source .= " ".$reg[1];
+}
+preg_match('@packageId="[^/]+/v([^"]+)"@',$eml,$reg);
+if(isset($reg[1])) {
+  $source .= " v".$reg[1];
+}
+$source = trim($source);
+
+// start reading the taxa
+$f=fopen($dst."/taxon.txt",'r');
 
 // read the headers for easier handling
 $headersRow = fgetcsv($f,0,"\t");
@@ -75,7 +88,7 @@ for($i=0;$i<count($headersRow);$i++){
     $headers[$headersRow[$i]] = $i;
 }
 
-$insert = $db->prepare("INSERT INTO taxons (`taxonID`,`family`,`genus`,`scientificName`,`scientificNameWithoutAuthorship`,`scientificNameAuthorship`,`taxonomicStatus`,`acceptedNameUsage`,`taxonRank`,`higherClassification`) VALUES (?,?,?,?,?,?,?,?,?,?) ;");
+$insert = $db->prepare("INSERT INTO taxa (`taxonID`,`family`,`genus`,`scientificName`,`scientificNameWithoutAuthorship`,`scientificNameAuthorship`,`taxonomicStatus`,`acceptedNameUsage`,`taxonRank`,`higherClassification`,`source`) VALUES (?,?,?,?,?,?,?,?,?,?,?) ;");
 $err = $db->errorInfo();
 if($err[0] != "00000") var_dump($db->errorInfo());
 
@@ -118,7 +131,8 @@ while($row = fgetcsv($f,0,"\t")) {
         $row[ $headers['taxonomicStatus'] ],
         $row[ $headers['acceptedNameUsage'] ],
         $row[ $headers['taxonRank'] ],
-        $row[ $headers['higherClassification'] ]
+        $row[ $headers['higherClassification'] ],
+        $source
     );
     $insert->execute($taxon);
     #echo "Inserted $i = {$taxon[0]}.\n";
@@ -131,7 +145,7 @@ fclose($f);
 echo "Inserted.\n";
 
 // start reading the relations
-$f=fopen("data/dwca/resourcerelationship.txt",'r');
+$f=fopen($dst."/resourcerelationship.txt",'r');
 
 // read the headers for easier handling
 $headersRow = fgetcsv($f,0,"\t");
@@ -140,7 +154,7 @@ for($i=0;$i<count($headersRow);$i++){
     $headers[$headersRow[$i]] = $i;
 }
 
-$update = $db->prepare("UPDATE taxons SET acceptedNameUsage=(SELECT acceptedNameUsage FROM taxons where taxonID=?) where taxonID=?");
+$update = $db->prepare("UPDATE taxa SET acceptedNameUsage=(SELECT acceptedNameUsage FROM taxa where taxonID=?) where taxonID=?");
 $err = $db->errorInfo();
 if($err[0] != "00000") var_dump($db->errorInfo());
 
@@ -168,7 +182,7 @@ fclose($f);
 
 # experimental output to couchdb
 if(isset($COUCHDB)) {
-    $q = $pdo->select("select * from taxons;");
+    $q = $pdo->select("select * from taxa;");
     $docs = array("docs"=>array());
     while($doc = $q->fetchObject()) {
         $doc->metadata = array("type"=>"taxon","created"=>time(),"source"=>$DWCA);
@@ -180,7 +194,7 @@ if(isset($COUCHDB)) {
 
 # experimental output to elasticsearch
 if(isset($ELASTICSEARCH)) {
-    $q = $pdo->select("select * from taxons;");
+    $q = $pdo->select("select * from taxa;");
     while($doc = $q->fetchObject()) {
         $doc->metadata = array("type"=>"taxon","created"=>time(),"source"=>$DWCA);
         $opts = ['http'=>['method'=>'POST','content'=>json_encode($doc),'header'=>'Content-type: application/json']];

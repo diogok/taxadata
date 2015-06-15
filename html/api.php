@@ -1,8 +1,8 @@
 <?php
 
 // config including DB
-require 'config.php';
-
+require '../app/config.php';
+#$db = new PDO('sqlite:'__DIR__.'/../data/taxa.db');
 
 // utils
 function http_get($url) {
@@ -39,7 +39,7 @@ if(isset($_GET['callback'])) {
 }
 
 // now comes from config
-#$db = new PDO('sqlite:data/taxons.db');
+#$db = new PDO('sqlite:data/taxa.db');
 
 // Default response
 $r = new StdClass;
@@ -47,7 +47,7 @@ $r->success=true;
 $r->result=null;
 
 if($q=='/search/species') { // specie search
-    $q = $db->prepare("select * from taxons where scientificName like ? "
+    $q = $db->prepare("select * from taxa where scientificName like ? "
                      ."and taxonomicStatus='accepted' order by family, scientificName limit 100;");
     $q->execute(array( "%".$_GET["query"]."%" ));
     $r->result=array();
@@ -55,7 +55,7 @@ if($q=='/search/species') { // specie search
         $r->result[] = $row;
     }
 } else if($q=='/families') { // families listing
-    $query = $db->query("select distinct(family) from taxons order by family;");
+    $query = $db->query("select distinct(family) from taxa order by family;");
     $r->result=array();
     while($row = $query->fetchObject()) {
         if(strlen( $row->family ) > 2) {
@@ -63,7 +63,7 @@ if($q=='/search/species') { // specie search
         }
     }
 } else if($q=="/species") { // species of family
-    $query = $db->prepare("select * from taxons where LOWER( family ) = ? order by scientificName;");
+    $query = $db->prepare("select * from taxa where LOWER( family ) = ? order by scientificName;");
     $query->execute(array(strtolower($_GET['family'])));
 
     $r->result=array();
@@ -87,7 +87,7 @@ if($q=='/search/species') { // specie search
         }
     }
 } else if($q=='/specie') { // specie data, fixing synonyms and stuff
-    $q = $db->prepare("select * from taxons where scientificName = ? or acceptedNameUsage like ? or scientificNameWithoutAuthorship = ?");
+    $q = $db->prepare("select * from taxa where scientificName = ? or acceptedNameUsage like ? or scientificNameWithoutAuthorship = ?");
     $q->execute(array($_GET["scientificName"],"%".$_GET["scientificName"]."%",$_GET["scientificName"]));
 
     $r->result=null;
@@ -106,7 +106,7 @@ if($q=='/search/species') { // specie search
 
     // case this is a synonym
     if($r->result == null && count( $miss ) >= 1) {
-        $r->result = $db->query("select * from taxons where scientificName = '".$miss[0]->acceptedNameUsage."';")->fetchObject();
+        $r->result = $db->query("select * from taxa where scientificName = '".$miss[0]->acceptedNameUsage."';")->fetchObject();
     }
 
     if($r->result != null) {

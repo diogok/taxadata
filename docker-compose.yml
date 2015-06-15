@@ -1,0 +1,6 @@
+apache:
+  image: cncflora/apache
+  ports:
+    - 8001:80
+  volumes:
+    - .:/var/www
