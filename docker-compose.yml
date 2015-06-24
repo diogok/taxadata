@@ -1,6 +1,7 @@
-apache:
-  image: cncflora/apache
+floradata:
+  build: .
   ports:
-    - 8001:80
+    - 8005:80
+    - 9005:9001
   volumes:
     - .:/var/www
