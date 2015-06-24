@@ -1,7 +1,7 @@
 floradata:
   build: .
   ports:
-    - 8005:80
+    - 8081:80
     - 9005:9001
   volumes:
     - .:/var/www
