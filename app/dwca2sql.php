@@ -49,8 +49,8 @@ if($err[0] != "00000") var_dump($db->errorInfo());
 
 // download
 echo "Downloading...\n";
-#if(file_Exists($data.'/dwca.zip')) unlink($data.'/dwca.zip');
-#system("wget '".$DWCA."' -O '".$data."/dwca.zip'");
+if(file_Exists($data.'/dwca.zip')) unlink($data.'/dwca.zip');
+system("wget '".$DWCA."' -O '".$data."/dwca.zip'");
 echo "Downloaded.\n";
 
 // Unzing
