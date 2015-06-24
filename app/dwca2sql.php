@@ -1,5 +1,14 @@
 <?php
 
+$data = __DIR__.'/../data';
+
+# create data dir if not exists
+if(!file_exists($data)) mkdir($data);
+
+# creates db if not exists
+if(!file_exists($data."/taxa.db")) $create=true;
+else $create=false;
+
 include 'config.php';
 
 // translation strings
@@ -28,15 +37,6 @@ $strings = array(
     'Tem como sinônimo BASIONIMO'=>'has_synonym'
 );
 
-$data = __DIR__.'/../data';
-
-# create data dir if not exists
-if(!file_exists($data)) mkdir($data);
-
-# creates db if not exists
-if(!file_exists($data."/taxa.db")) $create=true;
-else $create=false;
-
 // create table if not exists
 $db->exec(file_get_contents("schema.sql"));
 $err = $db->errorInfo();
@@ -50,7 +50,8 @@ if($err[0] != "00000") var_dump($db->errorInfo());
 // download
 echo "Downloading...\n";
 if(file_Exists($data.'/dwca.zip')) unlink($data.'/dwca.zip');
-system("wget '".$DWCA."' -O '".$data."/dwca.zip'");
+$command = 'wget '.$DWCA.' -O '.$data.'/dwca.zip';
+system($command);
 echo "Downloaded.\n";
 
 // Unzing
@@ -98,7 +99,7 @@ while($row = fgetcsv($f,0,"\t")) {
     # translate taxonomicStatus
     $row[$headers['taxonomicStatus']] = $strings[$row[$headers['taxonomicStatus']]] ;
 
-    # translate taxonRank 
+    # translate taxonRank
     $row[$headers['taxonRank']] = $strings[$row[$headers['taxonRank']]] ;
 
     # only interested in species, subspecies and variety
@@ -186,7 +187,7 @@ if(isset($COUCHDB)) {
     $docs = array("docs"=>array());
     while($doc = $q->fetchObject()) {
         $doc->metadata = array("type"=>"taxon","created"=>time(),"source"=>$DWCA);
-        $docs["docs"][] = $doc; 
+        $docs["docs"][] = $doc;
     }
     $opts = ['http'=>['method'=>'POST','content'=>json_encode($docs),'header'=>'Content-type: application/json']];
     file_get_contents($COUCHDB."/_bulk_docs", NULL, stream_context_create($opts));

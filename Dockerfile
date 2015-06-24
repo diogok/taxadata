@@ -1,7 +1,7 @@
 FROM cncflora/apache
 
 RUN apt-get update && \
-    apt-get install supervisor -y && \
+    apt-get install supervisor -y wget && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /var/log/supervisord
