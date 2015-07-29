@@ -38,7 +38,7 @@ $strings = array(
 );
 
 // create table if not exists
-$db->exec(file_get_contents("schema.sql"));
+$db->exec(file_get_contents(__DIR__."/schema.sql"));
 $err = $db->errorInfo();
 if($err[0] != "00000") var_dump($db->errorInfo());
 
