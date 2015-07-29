@@ -9,7 +9,7 @@ $db->exec('PRAGMA journal_mode = MEMORY');
 #$db = new PDO('pgsql:host=localhost;dbname=flora;user=flora;password=flora');
 
 // source darwincore archive
-$DWCA="http://dados.jbrj.gov.br/ipt/archive.do?r=lista_especies_flora_brasil";
+$DWCA="http://ipt.jbrj.gov.br/jbrj/archive.do?r=lista_especies_flora_brasil";
 
 // experimental output
 #$COUCHDB="";
