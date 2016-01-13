@@ -3,13 +3,17 @@
     "swaggerVersion":"1.2",
     "info":{
         "title":"Taxonomy.",
-        "description":"Taxonomy listing and flora integration.<br />Names from flora do brasil.",
+        "description":"Taxonomy listing.",
         "contact":"diogo@diogok.net"
     },
     "apis":[
         {
-            "path":"/../v1.json",
+            "path":"/../v2.json",
             "description":"Services"
+        },
+        {
+            "path":"/../v1.json",
+            "description":"Old services. Legacy."
         }
     ]
 }

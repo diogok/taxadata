@@ -1,8 +1,8 @@
-<?php require 'utils.php' ?><!DOCTYPE HTML>
+<!DOCTYPE HTML>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Flora Data</title>
+    <title>Taxa Data</title>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
     <style type="text/css">
@@ -35,13 +35,13 @@
 <body>
     <div class="container">
         <header class="col-md-12">
-            <h1>Flora Data.</h1>
-            <h2>Names from <a href="http://floradobrasil.jbrj.gov.br/">Flora do Brasil</a>.</h2>
+            <h1>Taxa Data.</h1>
+            <h2>Names from <span id='sources'></span></h2>
         </header>
         <div class="col-md-4" id='families'>
             <h3>Families</h3>
             <ul>
-                <li>Loading...</li>
+                <li>Select a source above.</li>
             </ul>
         </div>
         <div class="col-md-8" id='species'>
@@ -53,55 +53,68 @@
         <footer class="col-md-12">
             <p>
               <a href='api.html'>Developer API</a>
-              ,
-              <a href='data/taxons.db'>Download SQLite</a>.
             </p>
         </footer>
     </div>
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
     <script type="text/javascript">
-        $.getJSON("api/v1/families",function(data) {
-            data.result.sort();
-            var html = "";
-            for(var i=0;i<data.result.length;i++) {
-                html += "<li><a href='#"+data.result[i]+"'>"+data.result[i]+"</a></li>";
-            }
-            $("#families ul").html(html);
+
+        $.getJSON("api/v2/sources",function(data) {
+          console.log(data);
+          var html = "";
+          for(var i=0;i<data.result.length;i++) {
+              html += "<a href='#"+data.result[i]+"'>"+data.result[i]+"</a>; ";
+          }
+          $("#sources").html(html);
         });
+
+        function load_families(src) {
+          $("#families h3").html('Families for '+src);
+          $("#families ul").html("<li>Loading...</li>");
+          $.getJSON("api/v2/"+src+"/families",function(data) {
+              var html = "";
+              for(var i=0;i<data.result.length;i++) {
+                  html += "<li><a href='#"+src+'/'+data.result[i]+"'>"+data.result[i]+"</a></li>";
+              }
+              $("#families ul").html(html);
+              $("#species ul").html("<li>Select a family.</li>");
+          });
+        }
+
+        function load_species(src,family) {
+            $("#species h3").html("Species for "+family);
+            $("#species ul").html("<li>Loading...</li>");
+            $.getJSON("api/v2/"+src+"/"+family+"/species",function(data) {
+                var html = "";
+                for(var i=0;i<data.result.length;i++) {
+                    html += "<li>";
+                    html += "<i>"+data.result[i].scientificNameWithoutAuthorship+"</i> "+data.result[i].scientificNameAuthorship;
+                    html += "<ul>";
+                    for(var ii=0;ii<data.result[i].synonyms.length;ii++) {
+                        html += "<li>";
+                        html += "<i>"+data.result[i].synonyms[ii].scientificNameWithoutAuthorship+"</i> ";
+                        html += data.result[i].synonyms[ii].scientificNameAuthorship;
+                        html += "</li>";
+                    }
+                    html += "</ul>";
+                    html += "</li>";
+                }
+                $("#species ul").html(html);
+            });
+        }
 
         var lastHash = "";
         setInterval(function(){
-            if(location.hash != lastHash) {
-                $("#species h3").html("Species for "+location.hash.substring(1));
-                $("#species ul").html("<li>Loading...</li>");
-                $.getJSON("api/v1/species?family="+location.hash.substring(1),function(data) {
-                    data.result.sort();
-                    var html = "";
-                    for(var i=0;i<data.result.length;i++) {
-                        var lflora="http://floradobrasil.jbrj.gov.br/jabot/listaBrasil/FichaPublicaTaxonUC/FichaPublicaTaxonUC.do?id=FB"
-                                    +data.result[i].taxonID;
-                        var ldwc = location.origin+location.pathname.replace("index.html","")+"api/v1/occurrences?scientificName="
-                                   +encodeURIComponent(data.result[i].scientificNameWithoutAuthorship);
-                        var loccs="recline/index.html?from="+encodeURIComponent(ldwc);
-
-                        html += "<li>";
-                        html += "<i>"+data.result[i].scientificNameWithoutAuthorship+"</i> "+data.result[i].scientificNameAuthorship;
-                        html += "&nbsp; <a href='"+lflora+"' title='view flora' target='_blank'><span class='glyphicon glyphicon-leaf'></span></a>";
-                        html += "<ul>";
-                        for(var ii=0;ii<data.result[i].synonyms.length;ii++) {
-                            html += "<li>";
-                            html += "<i>"+data.result[i].synonyms[ii].scientificNameWithoutAuthorship+"</i> ";
-                            html += data.result[i].synonyms[ii].scientificNameAuthorship;
-                            html += "</li>";
-                        }
-                        html += "</ul>";
-                        html += "</li>";
-                    }
-                    $("#species ul").html(html);
-                });
+          if(location.hash != lastHash) {
+            var parts = location.hash.split('/');
+            if(parts.length==1) {
+              load_families(parts[0].substring(1));
+            } else if(parts.length==2) {
+              load_species(parts[0].substring(1),parts[1]);
             }
-            lastHash = location.hash;
+          }
+          lastHash = location.hash;
         },500);
     </script>
 </body>

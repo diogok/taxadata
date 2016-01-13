@@ -1,0 +1,119 @@
+{
+    "apiVersion":"v1",
+    "swaggerVersion":"1.2",
+    "resourcePath":"/v1",
+    "produces":["application/json"],
+    "models":{},
+    "apis": [
+        {
+            "path":"/v2/sources",
+            "operations":[
+                {
+                    "method":"GET",
+                    "summary":"List all data sources.",
+                    "nickname":"sources",
+                    "parameters":[ ]
+                }
+            ]
+        },
+        {
+            "path":"/v2/{source}/families",
+            "operations":[
+                {
+                    "method":"GET",
+                    "summary":"List all families of source.",
+                    "nickname":"families",
+                    "parameters":[
+                        {
+                            "name":"source",
+                            "description":"Source of data",
+                            "required":true,
+                            "type":"string",
+                            "paramType":"path"
+                        }
+                    ]
+ 
+                }
+            ]
+        },
+        {
+            "path":"/v2/{source}/{family}/species",
+            "operations":[
+                {
+                    "method":"get",
+                    "summary":"get species for family, with synonyms",
+                    "nickname":"species",
+                    "parameters":[
+                        {
+                            "name":"source",
+                            "description":"Source of data",
+                            "required":true,
+                            "type":"string",
+                            "paramType":"path"
+                        },
+                        {
+                            "name":"family",
+                            "description":"name of family",
+                            "required":true,
+                            "type":"string",
+                            "paramType":"path"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path":"/v2/{source}/specie/{scientificName}",
+            "operations":[
+                {
+                    "method":"get",
+                    "summary":"get species a specie data, with synonyms",
+                    "nickname":"specie",
+                    "parameters":[
+                        {
+                            "name":"source",
+                            "description":"Source of data",
+                            "required":true,
+                            "type":"string",
+                            "paramType":"path"
+                        },
+                        {
+                            "name":"scientificName",
+                            "description":"name of specie",
+                            "required":true,
+                            "type":"string",
+                            "paramType":"path"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path":"/v2/{source}/search/species",
+            "operations":[
+                {
+                    "method":"get",
+                    "summary":"Search a specie",
+                    "nickname":"search",
+                    "parameters":[
+                        {
+                            "name":"source",
+                            "description":"Source of data",
+                            "required":true,
+                            "type":"string",
+                            "paramType":"path"
+                        },
+                        {
+                            "name":"query",
+                            "description":"part of name of specie",
+                            "required":true,
+                            "type":"string",
+                            "paramType":"query"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
+

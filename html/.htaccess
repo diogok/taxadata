@@ -1,12 +1,9 @@
 
-<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|inc|bak)$">
-    Order Allow,Deny
-    Deny from all
-</FilesMatch>
-
-Options -Indexes
-
 RewriteEngine On
-#RewriteBase /
-RewriteRule ^api/v1/(.*)$ api.php?q=/$1 [L,QSA]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^api/v1/(.*)$ api.php?v1=true&q=/$1 [QSA]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^api/v2/(.*)$ api.php [QSA]
 
