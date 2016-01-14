@@ -1,4 +1,4 @@
-floradata:
+taxadata:
   build: .
   ports:
     - 8081:80

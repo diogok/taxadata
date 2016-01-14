@@ -1,4 +1,4 @@
-FROM cncflora/apache
+FROM diogok/apache
 
 WORKDIR /var/www
 CMD ["./run.sh"]
