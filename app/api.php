@@ -14,6 +14,12 @@ function connect($source) {
 
 $app = new \Slim\App;
 
+$app->get("/",function($req,$res){
+  header('Location: index.html');
+  exit;
+  return $res;
+});
+
 $app->get('/api/v2/sources',function($req,$res) {
   $r = new \StdClass;
   $r->success=true;

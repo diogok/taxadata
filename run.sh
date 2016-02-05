@@ -1,6 +1,8 @@
 #!/bin/bash
 
-/usr/sbin/apache2 -DFOREGROUND & 
+supervisord &
+
+mkdir data -p
 
 sleep 3
 
@@ -9,3 +11,4 @@ do
   php app/dwca2sql.php
   sleep 86400
 done
+
