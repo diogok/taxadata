@@ -5,6 +5,6 @@ CMD ["./run.sh"]
 
 RUN apt-get update && apt-get install curl -y
 
-COPY . /var/www
+ADD . /var/www
 RUN chown www-data.www-data /var/www -Rf
 

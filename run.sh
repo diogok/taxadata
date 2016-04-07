@@ -1,6 +1,9 @@
 #!/bin/bash
 
-supervisord &
+composer install
+
+nginx
+php-fpm7.0
 
 mkdir data -p
 
