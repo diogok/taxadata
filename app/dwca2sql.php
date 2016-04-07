@@ -87,10 +87,10 @@ foreach($sources as $src_name=>$src_url) {
   echo "Inserting...\n";
   while($row = fgetcsv($f,0,"\t")) {
       # translate taxonomicStatus
-      $row[$headers['taxonomicStatus']] = $strings[$row[$headers['taxonomicStatus']]] ;
+      $row[$headers['taxonomicStatus']] = get_string($row[$headers['taxonomicStatus']]) ;
 
       # translate taxonRank
-      $row[$headers['taxonRank']] = $strings[$row[$headers['taxonRank']]] ;
+      $row[$headers['taxonRank']] = get_string($row[$headers['taxonRank']]) ;
 
       # only interested in species, subspecies and variety
       $rank = $row[$headers['taxonRank']];
@@ -152,7 +152,7 @@ foreach($sources as $src_name=>$src_url) {
   $i=0;
   echo "Updating...\n";
   while($row = fgetcsv($f,0,"\t")) {
-      $relation = ( $strings[$row[$headers['relationshipOfResource']]]);
+      $relation = ( get_string($row[$headers['relationshipOfResource']]));
 
       $data=false;
       if($relation == 'synonym_of') {
