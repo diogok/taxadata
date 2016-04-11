@@ -86,6 +86,10 @@ foreach($sources as $src_name=>$src_url) {
   $i=0;
   echo "Inserting...\n";
   while($row = fgetcsv($f,0,"\t")) {
+      foreach($row as $k=>$v) {
+        $row[$k]=trim($v);
+      }
+
       # translate taxonomicStatus
       $row[$headers['taxonomicStatus']] = get_string($row[$headers['taxonomicStatus']]) ;
 
@@ -104,7 +108,17 @@ foreach($sources as $src_name=>$src_url) {
       }
 
       #scientificName without author
-      $nameWithoutAuthor = trim(str_replace(" ".$row[$headers['scientificNameAuthorship']],'',$row[$headers['scientificName']]));
+      if(strlen($row[$headers['scientificNameAuthorship']]) >= 1) {
+        $nameWithoutAuthor = trim(str_replace(" ".$row[$headers['scientificNameAuthorship']],'',$row[$headers['scientificName']]));
+      } else {
+        $nameWithoutAuthor = $row[$headers['scientificName']];
+      }
+
+      $maybeBreak = explode(" ",$nameWithoutAuthor);
+      if(count($maybeBreak) > 2) {
+        $nameWithoutAuthor = $maybeBreak[0]." ".$maybeBreak[1];
+        $row[$headers['scientificNameAuthorship']] = str_replace($nameWithoutAuthor." ",'',$row[$headers['scientificName']]);
+      }
 
       $t = [];
       foreach($headers as $k=>$v) {
