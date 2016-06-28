@@ -2,9 +2,9 @@
 
 Simplifying integration of DwC-A Checklist as a service.
 
-It loads an DarwinCore-Archive checklist into a database (sqlite) and expose it's data as a restful webservice.
+It loads several DarwinCore-Archive checklists into a database (sqlite) and expose it's data as a RESTful webservice.
 
-Test on [CNCFlora.jbrj.gov.br](http://cncflora.jbrj.gov.br/floradata), and view the Developer API there.
+Test on [http://159.203.76.187/taxadata/index.html](http://159.203.76.187/taxadata/index.html), and view the Developer API there.
 
 ## License
 
