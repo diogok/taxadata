@@ -7,6 +7,7 @@ if(!file_exists($data)) mkdir($data);
 
 include 'strings.php';
 include 'sources.php';
+file_put_contents($data."/status","starting");
 
 foreach($sources as $src_name=>$src_url) {
 
@@ -21,6 +22,7 @@ foreach($sources as $src_name=>$src_url) {
   if(!file_exists($data."/".$src_name.".db")) $create=true;
   else $create=false;
 
+  file_put_contents($data."/status","downloading");
   // download
   echo "Downloading...\n";
   if(file_Exists($data.'/dwca.zip')) unlink($data.'/dwca.zip');
@@ -28,6 +30,7 @@ foreach($sources as $src_name=>$src_url) {
   system($command);
   echo "Downloaded.\n";
 
+  file_put_contents($data."/status","unziping");
   // Unzing
   echo "Unzipping...\n";
   $dst=$data."/dwca";
@@ -73,6 +76,7 @@ foreach($sources as $src_name=>$src_url) {
   $err = $db->errorInfo();
   if($err[0] != "00000") var_dump($db->errorInfo());
 
+  file_put_contents($data."/status","cleaning");
   // clean table
   $db->exec("DELETE FROM taxa ;");
   $err = $db->errorInfo();
@@ -83,6 +87,7 @@ foreach($sources as $src_name=>$src_url) {
   $err = $db->errorInfo();
   if($err[0] != "00000") var_dump($db->errorInfo());
 
+  file_put_contents($data."/status","inserting");
   $i=0;
   echo "Inserting...\n";
   while($row = fgetcsv($f,0,"\t")) {
@@ -163,20 +168,21 @@ foreach($sources as $src_name=>$src_url) {
   $err = $db->errorInfo();
   if($err[0] != "00000") var_dump($db->errorInfo());
 
+  file_put_contents($data."/status","updating");
   $i=0;
   echo "Updating...\n";
   while($row = fgetcsv($f,0,"\t")) {
       $relation = ( get_string($row[$headers['relationshipOfResource']]));
 
-      $data=false;
+      $content=false;
       if($relation == 'synonym_of') {
-        $data = [$row[1],$row[0]];
+        $content = [$row[1],$row[0]];
       } else if($relation == 'has_synonym') {
-        $data = [$row[0],$row[1]];
+        $content = [$row[0],$row[1]];
       }
 
-      if($data) {
-        $update->execute($data);
+      if($content) {
+        $update->execute($content);
         $err = $update->errorInfo();
         if($err[0] != "00000") var_dump($update->errorInfo());
       }
@@ -188,3 +194,6 @@ foreach($sources as $src_name=>$src_url) {
   echo "Done.\n";
 
 }
+
+file_put_contents($data."/status","done");
+

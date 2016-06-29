@@ -20,6 +20,12 @@ $app->get("/",function($req,$res){
   return $res;
 });
 
+$app->get("/api/v2/status",function($req,$res) {
+  $json =json_encode(["status"=>file_get_contents(__DIR__."/../data/status")]);
+  $res->getBody()->write($json);
+  return $res;
+});
+
 $app->get('/api/v2/sources',function($req,$res) {
   $r = new \StdClass;
   $r->success=true;
