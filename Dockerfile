@@ -3,6 +3,6 @@ FROM diogok/php7
 WORKDIR /var/www
 CMD ["./run.sh"]
 
-ADD . /var/www
+COPY . /var/www
 RUN chown www-data.www-data /var/www -Rf
 
