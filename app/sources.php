@@ -7,6 +7,5 @@ if(file_exists("/etc/biodiv/taxadata.init")) {
 } else if(file_exists(__DIR__."/../config/taxadata.ini")) {
   $sources = array_merge($sources,parse_ini_file(__DIR__."/../config/taxadata.ini"));
 }
-var_dump($sources);
 
 

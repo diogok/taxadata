@@ -31,11 +31,23 @@ $app->get('/api/v2/sources',function($req,$res) {
   $r->success=true;
   $r->result=[];
 
-  $dir = opendir( __DIR__.'/../data' );
-  while($f = readdir($dir)) {
-    if(preg_match('/^[a-zA-Z0-9]+.db$/',$f)) {
-      $r->result[] = str_replace(".db","",$f);
-    }
+  include __DIR__.'/sources.php';
+  foreach($sources as $name=>$url) {
+    $r->result[] = $name;
+  }
+
+  $res->getBody()->write(json_encode($r));
+  return $res;
+});
+
+$app->get('/api/v2/sources/urls',function($req,$res) {
+  $r = new \StdClass;
+  $r->success=true;
+  $r->result=[];
+
+  include __DIR__.'/sources.php';
+  foreach($sources as $name=>$url) {
+    $r->result[] = str_replace("archive","resource",$url);
   }
 
   $res->getBody()->write(json_encode($r));
